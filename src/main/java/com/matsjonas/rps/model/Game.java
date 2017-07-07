@@ -93,4 +93,17 @@ public class Game {
         }
     }
 
+    /**
+     * Checks if the game is a draw.
+     * <p>
+     * This method should only be called after {@link #addSecondBet(String, Bet)} and will raise an
+     * <tt>IllegalStateException</tt> otherwise.
+     *
+     * @return <tt>true</tt> if both players' bets are the same, <tt>false</tt> otherwise.
+     * @throws IllegalStateException if called before {@link #addSecondBet(String, Bet)}.
+     */
+    public boolean isDraw() {
+        return player1Bet == player2Bet;
+    }
+
 }
