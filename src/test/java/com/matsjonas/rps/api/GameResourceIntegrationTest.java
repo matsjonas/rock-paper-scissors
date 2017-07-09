@@ -1,139 +1,156 @@
 package com.matsjonas.rps.api;
 
-import com.matsjonas.rps.api.dto.MakeBetDTO;
-import com.matsjonas.rps.api.dto.ResponseDTO;
+import com.matsjonas.rps.model.Bet;
+import com.matsjonas.rps.model.Game;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class GameResourceIntegrationTest {
 
+    private static final String URI_GAME_LIST = "http://localhost:8081/rps/api/games";
+    private static final String URI_TEMPLATE_GAME = "http://localhost:8081/rps/api/games/%s";
+    private static final String URI_TEMPLATE_GAME_BETS = "http://localhost:8081/rps/api/games/%s/bets";
+
     private static Client client;
-    private static WebTarget webTarget;
 
     @BeforeClass
     public static void beforeClass() {
         client = ClientBuilder.newClient();
-        webTarget = client.target("http://localhost:8081/rps/api/game");
     }
 
     @Test
-    public void testSuccessfulRequestChain() throws Exception {
+    public void testSimpleGameProcedure() throws Exception {
+        String gameName = "game1";
 
-        MakeBetDTO dto1 = new MakeBetDTO();
-        dto1.setPlayer("Adam");
-        dto1.setBet("ROCK");
+        List<Game> allGames = getAllGames();
+        assertTrue(allGames.isEmpty());
 
-        Response response1 = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(dto1, MediaType.APPLICATION_JSON_TYPE));
+        allGames = createGame(gameName);
+        assertEquals(1, allGames.size());
+        Game game = allGames.get(0);
+        assertEquals(gameName, game.getId());
+        assertEquals(Game.Status.PENDING, game.getStatus());
+        assertTrue(game.getBets().isEmpty());
+
+        game = getGame(gameName);
+        assertEquals(gameName, game.getId());
+        assertEquals(Game.Status.PENDING, game.getStatus());
+        assertTrue(game.getBets().isEmpty());
+
+        game = placeBet(gameName, "Adam", "ROCK");
+        assertEquals(gameName, game.getId());
+        assertEquals(Game.Status.ONGOING, game.getStatus());
+        assertEquals(1, game.getBets().size());
+        assertNotNull(game.getBets().get(0));
+        assertEquals("Adam", game.getBets().get(0).getPlayerName());
+        assertEquals(Bet.valueOf("ROCK"), game.getBets().get(0).getBet());
+
+        game = placeBet(gameName, "Bertil", "PAPER");
+        assertEquals(gameName, game.getId());
+        assertEquals(Game.Status.WIN, game.getStatus());
+        assertEquals(2, game.getBets().size());
+        assertNotNull(game.getBets().get(0));
+        assertEquals("Adam", game.getBets().get(0).getPlayerName());
+        assertEquals(Bet.valueOf("ROCK"), game.getBets().get(0).getBet());
+        assertNotNull(game.getBets().get(1));
+        assertEquals("Bertil", game.getBets().get(1).getPlayerName());
+        assertEquals(Bet.valueOf("PAPER"), game.getBets().get(1).getBet());
+        assertEquals("Bertil", game.getWinner().getPlayerName());
+        assertEquals(Bet.valueOf("PAPER"), game.getWinner().getBet());
+
+    }
+
+    @Test
+    public void testDeleteGame() throws Exception {
+        String gameName = "game3";
+
+        List<Game> allGames = getAllGames();
+        int origSize = allGames.size();
+
+        allGames = createGame(gameName);
+        assertEquals(origSize + 1, allGames.size());
+
+        Game game = placeBet(gameName, "Cesar", "ROCK");
+        assertEquals(Game.Status.ONGOING, game.getStatus());
+
+        game = placeBet(gameName, "David", "SCISSORS");
+        assertEquals(gameName, game.getId());
+        assertEquals(Game.Status.WIN, game.getStatus());
+
+        Response response1 = client.target(String.format(URI_TEMPLATE_GAME, gameName))
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .delete();
 
         assertEquals(200, response1.getStatus());
-        ResponseDTO responseDTO1 = response1.readEntity(ResponseDTO.class);
-        assertEquals("Game started", responseDTO1.getMessage());
+        allGames = getAllGames();
+        assertEquals(origSize, allGames.size());
 
-        MakeBetDTO dto2 = new MakeBetDTO();
-        dto2.setPlayer("Bertil");
-        dto2.setBet("PAPER");
+        Response response = client.target(String.format(URI_TEMPLATE_GAME, gameName))
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
 
-        Response response2 = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(dto2, MediaType.APPLICATION_JSON_TYPE));
-
-        assertEquals(200, response2.getStatus());
-        ResponseDTO responseDTO2 = response2.readEntity(ResponseDTO.class);
-        assertEquals("Winner is Bertil", responseDTO2.getMessage());
-
-        MakeBetDTO dto3 = new MakeBetDTO();
-        dto3.setPlayer("Cesar");
-        dto3.setBet("SCISSORS");
-
-        Response response3 = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(dto3, MediaType.APPLICATION_JSON_TYPE));
-
-        assertEquals(200, response3.getStatus());
-        ResponseDTO responseDTO3 = response3.readEntity(ResponseDTO.class);
-        assertEquals("Game started", responseDTO3.getMessage());
+        assertEquals(404, response.getStatus());
     }
 
-    @Test
-    public void testInvalidRequests() throws Exception {
+    private List<Game> getAllGames() {
+        Response response = client.target(URI_GAME_LIST)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
 
-        MakeBetDTO dto1 = new MakeBetDTO();
-        dto1.setBet("ROCK");
-
-        Response response1 = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(dto1, MediaType.APPLICATION_JSON_TYPE));
-
-        assertEquals(400, response1.getStatus());
-
-        MakeBetDTO dto2 = new MakeBetDTO();
-        dto2.setPlayer("Bertil");
-
-        Response response2 = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(dto2, MediaType.APPLICATION_JSON_TYPE));
-
-        assertEquals(400, response2.getStatus());
-
-
-        MakeBetDTO dto3 = new MakeBetDTO();
-        dto3.setPlayer("Cesar");
-        dto3.setBet("SPOCK");
-
-        Response response3 = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(dto3, MediaType.APPLICATION_JSON_TYPE));
-
-        assertEquals(400, response3.getStatus());
+        assertEquals(200, response.getStatus());
+        return response.readEntity(new GenericType<List<Game>>() {
+        });
     }
 
-    @Test
-    public void testSuccessfulRequestChainWithInvalidInMiddle() throws Exception {
+    private List<Game> createGame(String gameName) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("id", gameName);
 
-        MakeBetDTO dto1 = new MakeBetDTO();
-        dto1.setPlayer("Adam");
-        dto1.setBet("ROCK");
+        Response response = client.target(URI_GAME_LIST)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.json(data));
 
-        Response response1 = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(dto1, MediaType.APPLICATION_JSON_TYPE));
+        assertEquals(200, response.getStatus());
 
-        assertEquals(200, response1.getStatus());
-        ResponseDTO responseDTO1 = response1.readEntity(ResponseDTO.class);
-        assertEquals("Game started", responseDTO1.getMessage());
+        return response.readEntity(new GenericType<List<Game>>() {});
+    }
 
-        MakeBetDTO dto2 = new MakeBetDTO();
-        dto2.setPlayer("Bertil");
-        dto2.setBet("LIZARD");
+    private Game getGame(String gameName) {
+        Response response = client.target(String.format(URI_TEMPLATE_GAME, gameName))
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
 
-        Response response2 = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(dto2, MediaType.APPLICATION_JSON_TYPE));
+        assertEquals(200, response.getStatus());
 
-        assertEquals(400, response2.getStatus());
+        return response.readEntity(Game.class);
+    }
 
-        MakeBetDTO dto3 = new MakeBetDTO();
-        dto3.setPlayer("Cesar");
-        dto3.setBet("SCISSORS");
+    private Game placeBet(String gameName, String playerName, String bet) {
+        HashMap<String, String> data;
+        Response response;
+        Game game;
+        data = new HashMap<>();
+        data.put("playerName", playerName);
+        data.put("bet", bet);
 
-        Response response3 = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(dto3, MediaType.APPLICATION_JSON_TYPE));
+        response = client.target(String.format(URI_TEMPLATE_GAME_BETS, gameName))
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.json(data));
 
-        assertEquals(200, response3.getStatus());
-        ResponseDTO responseDTO3 = response3.readEntity(ResponseDTO.class);
-        assertEquals("Winner is Adam", responseDTO3.getMessage());
+        assertEquals(200, response.getStatus());
+        game = response.readEntity(Game.class);
+        return game;
     }
 
 }

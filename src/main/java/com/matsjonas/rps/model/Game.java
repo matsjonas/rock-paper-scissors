@@ -1,109 +1,122 @@
 package com.matsjonas.rps.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.LinkedList;
+import java.util.List;
+
 /**
- * A Game represents a round of rock-paper-scissors with two players.
+ * A Game represents a round of rock-paper-scissors.
  * <p>
- * Each player has a name and a selected bet. Games can end either with a winner och in a draw. To start a new game the
- * constructor {@link Game#Game(String, Bet)} is used with player 1's name and bet. Player 2's name and bet is then
- * applied using the {@link Game#addSecondBet(String, Bet)} method to the Game instance returned by the constructor.
- * Finally the winner is checked in {@link #getWinner()} who returns either the winning player's name or the string
- * {@link Game#RESULT_STRING_DRAW}.
+ * A Game holds information about it's id (a name of some sort), placed bets in a list of {@link PlayerBet} objects, the
+ * status of the game ({@link Status} and the potential winner of the game (unless it was a draw).
  * <p>
  * Sequence of a game goes as follows.
  * <ol>
- * <li> Create a Game instance with {@link Game#Game(String, Bet)}.
- * <li> Add second player's bet with {@link #addSecondBet(String, Bet)}.
- * <li> Check who won with {@link Game#getWinner()}
+ * <li> Create a Game instance with {@link Game#Game(String)}.
+ * <li> Add a first bet with {@link #addPlayerBet(PlayerBet)}.
+ * <li> Add a second bet with {@link #addPlayerBet(PlayerBet)}.
+ * <li> Check who won with {@link Game#getWinner()}, or for a tie using {@link #getStatus()}.
+ * </ol>
  */
 public class Game {
 
     /**
-     * The default string representation of a game ending in a draw.
+     * Status enum for possible Game statuses.
      */
-    public static final String RESULT_STRING_DRAW = "RESULT_STRING_DRAW!";
+    public enum Status {
+        PENDING, ONGOING, WIN, DRAW
+    }
 
-    private String player1Name;
-    private String player2Name;
-    private Bet player1Bet;
-    private Bet player2Bet;
+    private String id;
+    private List<PlayerBet> bets;
+    private Status status;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private PlayerBet winner;
 
     /**
-     * Constructs a new Game instance. Explicitly takes player 1's name and bet.
-     *
-     * @param player1Name player 1's name.
-     * @param player1Bet  player 1's bet.
-     * @throws IllegalArgumentException if any argument is null.
+     * Empty constructor needed by Jackson in order to [de]serialize object.
      */
-    public Game(String player1Name, Bet player1Bet) {
-        if (player1Name == null || player1Bet == null) {
-            throw new IllegalArgumentException(String.format("All arguments must be non null! player1Name: %s, player1Bet: %s", player1Name, player1Bet));
-        }
-        this.player1Name = player1Name;
-        this.player1Bet = player1Bet;
+    public Game() {
+
     }
 
     /**
-     * Applies player 2's name and bet to the game.
-     * <p>
-     * This method can only be called once, since it wouldn't be fair to let player 2 change it's bet.
+     * Constructs a new Game instance and sets it's id to <var>id</var>.
      *
-     * @param player2Name player 2's name.
-     * @param player2Bet  player 2's bet.
-     * @return <tt>this</tt> to allow chaining of calls.
-     * @throws IllegalArgumentException if any argument is null.
-     * @throws IllegalStateException    if a second bet has already been placed.
+     * @param id the id, i.e. name of the game.
      */
-    public Game addSecondBet(String player2Name, Bet player2Bet) {
-        if (player2Name == null || player2Bet == null) {
-            throw new IllegalArgumentException(String.format("All arguments must be non null! player2Name: %s, player2Bet: %s", player2Name, player2Bet));
+    public Game(String id) {
+        if (StringUtils.isBlank(id)) {
+            throw new IllegalArgumentException("id must not be blank!");
         }
-        if (this.player2Name != null || this.player2Bet != null) {
-            throw new IllegalStateException(String.format("Second bet already placed! player2Name: %s, player2Bet: %s", player2Name, player2Bet));
+        this.id = id;
+        this.status = Status.PENDING;
+        this.bets = new LinkedList<>();
+    }
+
+    /**
+     * Adds a new {@link PlayerBet} to the game.
+     * <p>
+     * A game is over when two bets have been placed.
+     *
+     * @param newPlayerBet the player bet to add.
+     * @return <tt>this</tt>, to allow chaining of calls
+     * @throws IllegalArgumentException if <var>newPlayerBet</var> is <tt>null</tt>.
+     * @throws IllegalStateException    if 2 bets have already been placed.
+     */
+    public Game addPlayerBet(PlayerBet newPlayerBet) {
+        if (newPlayerBet == null) {
+            throw new IllegalArgumentException("New PlayerBet must not be null");
+        } else if (bets.size() == 2) {
+            throw new IllegalStateException("All bets already placed");
         }
-        this.player2Name = player2Name;
-        this.player2Bet = player2Bet;
+
+        if (bets.isEmpty()) {
+            bets.add(newPlayerBet);
+            status = Status.ONGOING;
+        } else if (bets.size() == 1) {
+            bets.add(newPlayerBet);
+            completeGame();
+        }
 
         return this;
     }
 
     /**
-     * Checks who won the game.
-     * <p>
-     * Returns either the winning player name or the string {@link #RESULT_STRING_DRAW}. A player wins the game if the
-     * player's bet {@link Bet#beats(Bet) beats} the other player's bet. If no bet beats the other's the game is
-     * considered a draw.
-     * <p>
-     * This method should only be called after {@link #addSecondBet(String, Bet)} and will raise an
-     * <tt>IllegalStateException</tt> otherwise.
-     *
-     * @return the winning player name or the string {@link #RESULT_STRING_DRAW}.
-     * @throws IllegalStateException if called before {@link #addSecondBet(String, Bet)}.
+     * Performs calculations and field updates necessary for a finished game.
      */
-    public String getWinner() {
-        if (player2Name == null) {
-            throw new IllegalStateException("Game is still going on!");
-        }
+    private void completeGame() {
+        Bet bet1 = bets.get(0).getBet();
+        Bet bet2 = bets.get(1).getBet();
 
-        if (player1Bet.beats(player2Bet)) {
-            return player1Name;
-        } else if (player2Bet.beats(player1Bet)) {
-            return player2Name;
+        if (bet1.beats(bet2)) {
+            winner = bets.get(0);
+            status = Status.WIN;
+        } else if (bet2.beats(bet1)) {
+            winner = bets.get(1);
+            status = Status.WIN;
         } else {
-            return RESULT_STRING_DRAW;
+            winner = null;
+            status = Status.DRAW;
         }
     }
 
-    /**
-     * Checks if the game is a draw.
-     * <p>
-     * This method should only be called after {@link #addSecondBet(String, Bet)} and will raise an
-     * <tt>IllegalStateException</tt> otherwise.
-     *
-     * @return <tt>true</tt> if both players' bets are the same, <tt>false</tt> otherwise.
-     * @throws IllegalStateException if called before {@link #addSecondBet(String, Bet)}.
-     */
-    public boolean isDraw() {
-        return player1Bet == player2Bet;
+    public String getId() {
+        return id;
+    }
+
+    public List<PlayerBet> getBets() {
+        return bets;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public PlayerBet getWinner() {
+        return winner;
     }
 
 }
