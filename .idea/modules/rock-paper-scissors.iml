@@ -15,21 +15,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.9" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.8.9" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.9" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.8.9" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.8.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.8.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.9" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.9" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.8.9" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.9" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.8.9" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.9" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.apache.commons:commons-lang3:3.5" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.commons:commons-lang3:3.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.commons:commons-lang3:3.5" level="project" />
@@ -103,5 +88,20 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.glassfish.jersey.media:jersey-media-json-jackson:2.26-b03" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.glassfish.jersey.ext:jersey-entity-filtering:2.26-b03" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.8.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.8.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.8.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.8.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.8.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.8.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.8.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.4" level="project" />
   </component>
 </module>
