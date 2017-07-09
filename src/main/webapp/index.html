@@ -8,13 +8,42 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="css/normalize.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
         <link rel="stylesheet" href="css/main.css">
 
         <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+
+        <!-- Rock, paper and scissor icons borrowed from https://rockpaperscissors.com/ -->
     </head>
     <body>
 
-        <p>Hello world! This is HTML5 Boilerplate.</p>
+        <div id="container">
+            <div id="title">Rock-Paper-Scissors</div>
+            <div id="left">
+                <div class="gameBox" id="gameBox1">
+                    <div class="gameInput">
+                        <input type="text" name="playerName1" id="playerName1" value="Ada">
+                    </div>
+                    <div class="gameChoices">
+                        <img src="img/rock.png" alt="ROCK" data-value="ROCK"/>
+                        <img src="img/paper.png" alt="PAPER" data-value="PAPER"/>
+                        <img src="img/scissors.png" alt="SCISSORS" data-value="SCISSORS"/>
+                    </div>
+                </div>
+            </div>
+            <div id="right">
+                <div class="gameBox" id="gameBox2">
+                    <div class="gameInput">
+                        <input type="text" name="playerName2" id="playerName2" value="Bertha">
+                    </div>
+                    <div class="gameChoices">
+                        <img src="img/rock.png" alt="ROCK" data-value="ROCK"/>
+                        <img src="img/paper.png" alt="PAPER" data-value="PAPER"/>
+                        <img src="img/scissors.png" alt="SCISSORS" data-value="SCISSORS"/>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>

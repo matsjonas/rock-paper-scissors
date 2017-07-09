@@ -56,19 +56,71 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
+html, body {
+    margin: 0;
+    height: 100%;
+}
 
+#container {
+    position: relative;
+    height: 100%;
+    font-family: 'Lobster', cursive;
+}
 
+#title {
+    position: absolute;
+    top: 50px;
+    left: 20%;
+    right: 20%;
+    z-index: 9;
+    text-align: center;
+    background-color: #5D4C46;
+    color: #E45641;
+    font-size: 60px;
+}
 
+#left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 50%;
+    bottom: 0;
+    background-color: #44B3C2;
+}
 
+#right {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    right: 0;
+    bottom: 0;
+    background-color: #F1A94E;
+}
 
+.gameBox {
+    position: absolute;
+    top: 220px;
+    left: 10%;
+    right: 10%;
+    background-color: #7B8D8E;
+    text-align: center;
+}
 
+.gameBox .gameInput input {
+    margin: 20px 10px 10px 10px;
+    font-size: 20px;
+    text-align: center;
+}
 
+.gameBox .gameChoices {
+    text-align: center;
+    margin: 10px 10px 20px 10px;
+}
 
-
-
-
-
-
+.gameBox .gameChoices img {
+    display: inline;
+    cursor: pointer;
+}
 
 /* ==========================================================================
    Media Queries
