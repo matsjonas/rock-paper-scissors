@@ -163,7 +163,11 @@ public class GameResource {
             throw new BadRequestException("Invalid bet");
         }
 
-        game.addPlayerBet(playerBet);
+        try {
+            game.addPlayerBet(playerBet);
+        } catch (IllegalStateException e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         return game;
     }

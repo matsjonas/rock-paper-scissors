@@ -34,10 +34,10 @@ public class GameResourceIntegrationTest {
         String gameName = "game1";
 
         List<Game> allGames = getAllGames();
-        assertTrue(allGames.isEmpty());
+        int origSize = allGames.size();
 
         allGames = createGame(gameName);
-        assertEquals(1, allGames.size());
+        assertEquals(origSize + 1, allGames.size());
         Game game = allGames.get(0);
         assertEquals(gameName, game.getId());
         assertEquals(Game.Status.PENDING, game.getStatus());
@@ -69,6 +69,37 @@ public class GameResourceIntegrationTest {
         assertEquals("Bertil", game.getWinner().getPlayerName());
         assertEquals(Bet.valueOf("PAPER"), game.getWinner().getBet());
 
+    }
+
+    @Test
+    public void testTooManyBets() throws Exception {
+        String gameName = "game2";
+
+        createGame(gameName);
+
+        Game game = getGame(gameName);
+        assertEquals(gameName, game.getId());
+        assertEquals(Game.Status.PENDING, game.getStatus());
+        assertTrue(game.getBets().isEmpty());
+
+        placeBet(gameName, "Adam", "ROCK");
+        placeBet(gameName, "Bertil", "PAPER");
+
+        HashMap<String, String> data;
+        data = new HashMap<>();
+        data.put("playerName", "Cesar");
+        data.put("bet", "SCISSORS");
+
+        Response response = client.target(String.format(URI_TEMPLATE_GAME_BETS, gameName))
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.json(data));
+
+        assertEquals(400, response.getStatus());
+
+        game = getGame(gameName);
+        assertEquals(gameName, game.getId());
+        assertEquals(Game.Status.WIN, game.getStatus());
+        assertEquals(2, game.getBets().size());
     }
 
     @Test
@@ -109,8 +140,8 @@ public class GameResourceIntegrationTest {
                 .get();
 
         assertEquals(200, response.getStatus());
-        return response.readEntity(new GenericType<List<Game>>() {
-        });
+
+        return response.readEntity(new GenericType<List<Game>>() {});
     }
 
     private List<Game> createGame(String gameName) {
@@ -138,19 +169,17 @@ public class GameResourceIntegrationTest {
 
     private Game placeBet(String gameName, String playerName, String bet) {
         HashMap<String, String> data;
-        Response response;
-        Game game;
         data = new HashMap<>();
         data.put("playerName", playerName);
         data.put("bet", bet);
 
-        response = client.target(String.format(URI_TEMPLATE_GAME_BETS, gameName))
+        Response response = client.target(String.format(URI_TEMPLATE_GAME_BETS, gameName))
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .post(Entity.json(data));
 
         assertEquals(200, response.getStatus());
-        game = response.readEntity(Game.class);
-        return game;
+        
+        return response.readEntity(Game.class);
     }
 
 }
