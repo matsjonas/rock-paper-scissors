@@ -15,7 +15,7 @@ Start the application using gradle:
 $ gradle jettyStart
 ```
 
-Use curl to try out the API.
+Use curl to try out the API or go to http://localhost:8081/rps
 
 Start by listing all existing games (there should be none).
 
@@ -71,12 +71,9 @@ $ gradle integrationTest    // integration tests
 $ gradle check              // all tests
 ```
 
-### GUI - or lack thereof
-
-Currently there is no GUI, but I aim to add one later in the form of a simple web page.
-
 ### TODO:
 
 - [x] Allow multiple game to go on at once
-- [ ] Add simple web page GUI
+- [x] Add simple web page GUI
 - [ ] Add limitations for game ids and player names.
+- [ ] Implement some sort of security mechanism
